@@ -5,68 +5,47 @@ import (
 	"testing"
 )
 
+func assert(t *testing.T, want, got uint) {
+	if want != got {
+		t.Errorf("want: %v, got: %v", want, got)
+	}
+}
+
+func TestNew(t *testing.T) {
+	inc := New()
+	assert(t, inc.Val(), 0)
+	assert(t, inc.MaxVal(), Max)
+}
+
 func TestIncrement(t *testing.T) {
 	inc := New()
-
-	if inc.Val() != 0 {
-		t.Errorf("want: 0, got: %v", inc.Val())
-	}
-
 	inc = inc.Inc()
+	assert(t, inc.Val(), 1)
+}
 
-	if inc.Val() != 1 {
-		t.Errorf("want: 1, got: %v", inc.Val())
-	}
+func TestSetMaxValue(t *testing.T) {
+	num := New()
+	num = num.SetMaxValue(2)
+	assert(t, num.MaxVal(), 2)
 }
 
 func TestIncrementOverflow(t *testing.T) {
 	inc := New()
-
-	for i := 0; i < Max; i++ {
-		inc = inc.Inc()
-	}
+	inc = inc.SetMaxValue(1)
+	inc = inc.Inc()
 
 	// overflow number
 	inc = inc.Inc()
-
-	if v := inc.Val(); v != 0 {
-		t.Errorf("want: 0, got: %v", v)
-	}
-}
-
-func TestSetMaxValue(t *testing.T) {
-	zero := New()
-	zero = zero.SetMaxValue(2)
-
-	one := zero.Inc()
-	two := one.Inc()
-
-	if two.Val() != 2 {
-		t.Errorf("want: 2\ngot: %v", two.Val())
-	}
-
-	zero = two.Inc()
-	if zero.Val() != 0 {
-		t.Errorf("want: 0\ngot: %v", zero.Val())
-	}
-
-	two = two.SetMaxValue(3)
-	three := two.Inc()
-	if three.Val() != 3 {
-		t.Errorf("want: 3\ngot: %v", three.Val())
-	}
+	assert(t, inc.Val(), 0)
 }
 
 func TestSetMaxValue_IfNewMaxLessThanValueThenSetValueToZero(t *testing.T) {
 	inc := New()
-
 	inc = inc.Inc()
 	inc = inc.Inc()
 	inc = inc.Inc()
 
 	inc = inc.SetMaxValue(2)
-
-	if inc.Val() != 0 {
-		t.Errorf("want: 0, got: %v", inc.Val())
-	}
+	assert(t, inc.Val(), 0)
 }
+
